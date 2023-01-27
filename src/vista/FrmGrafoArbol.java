@@ -63,7 +63,6 @@ public class FrmGrafoArbol extends javax.swing.JDialog {
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         graphComponent.setSize(new Dimension(800, 400));
         jPanel1.add(graphComponent, BorderLayout.CENTER);
-
         Object parent = graph.getDefaultParent();
         graph.getModel().beginUpdate();
         try {
