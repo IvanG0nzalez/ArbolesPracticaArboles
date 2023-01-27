@@ -6,6 +6,7 @@
 package controlador.arbol;
 
 import controlador.Listas.ListaEnlazada;
+import vista.FrmArbolBinario;
 
 /**
  *
@@ -169,6 +170,8 @@ public class Arbol {
             a.postOrden().imprimir();
             System.out.println("IN ORDEN");
             a.inOrden().imprimir();
+            FrmArbolBinario frmArbolBinario = new FrmArbolBinario(a);
+            frmArbolBinario.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
