@@ -14,7 +14,7 @@ import controlador.arbol.Arbol;
  * @author Usuario iTC
  */
 public class ModeloTablaArbol extends AbstractTableModel {
-    
+
     private Arbol arbol;
 
     public Arbol getArbol() {
@@ -26,20 +26,20 @@ public class ModeloTablaArbol extends AbstractTableModel {
     }
 
     @Override
-    public int getRowCount()  {
+    public int getRowCount() {
         try {
-           return arbol.getAltura();
+            return arbol.getAltura();
         } catch (Exception e) {
             System.out.println(e);
             return 0;
-        }    
+        }
     }
 
     @Override
     public int getColumnCount() {
         return arbol.getNro_nodos();
     }
-    
+
     @Override
     public String getColumnName(int column) {
         return "";
@@ -48,14 +48,20 @@ public class ModeloTablaArbol extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Arbol a = arbol;
-        for(int i = 0; i <= a.getNiveles().getSize()-1; i++){
-            for(int j = 0; j <= a.getNro_nodos(); j++){
-                
+//        for(int i = 0; i <= a.getNiveles().getSize()-1; i++){
+//            for(int j = 0; j <= a.getNro_nodos(); j++){
+//                
+//            }
+//        }
+        try {
+            if (arbol.getNiveles().obtener(rowIndex).obtener(columnIndex).getDato() == null) {
+                return "---";
+            } else {
+                return arbol.getNiveles().obtener(rowIndex).obtener(columnIndex).getDato();
             }
+        } catch (Exception e) {
         }
         return "";
     }
-    
-    
-    
+
 }
