@@ -22,6 +22,7 @@ import controlador.PosicionController;
 import controlador.grafo.GrafoNoDirigidoEtiquetado;
 import modelo.Posicion;
 import modelo.enums.Orientacion;
+import modelo.jarra.Jarra;
 
 /**
  *
@@ -43,17 +44,25 @@ public class Utilidades {
     public static Orientacion getOrientacionCombo(JComboBox cbx) {
         return (Orientacion) cbx.getSelectedItem();
     }
-    
-    public static JComboBox cargarComboPosiciones(JComboBox cbx, PosicionController pc) throws Exception{
+
+    public static JComboBox cargarComboPosiciones(JComboBox cbx, PosicionController pc) throws Exception {
         cbx.removeAllItems();
-        for(int i = 0; i < pc.getPosiciones().getSize(); i++){
+        for (int i = 0; i < pc.getPosiciones().getSize(); i++) {
             cbx.addItem(pc.getPosiciones().obtener(i));
         }
         return cbx;
     }
-    
-    public static Posicion getPosicionCombo(JComboBox cbx){
+
+    public static Posicion getPosicionCombo(JComboBox cbx) {
         return (Posicion) cbx.getSelectedItem();
+    }
+
+    public static JComboBox cargarComboEstado(JComboBox cbx, Jarra j) throws Exception {
+        cbx.removeAllItems();
+        for (int i = 0; i <= j.getCapacidad(); i++) {
+            cbx.addItem(i);
+        }
+        return cbx;
     }
 
     public static String capitalizar(String nombre) {
@@ -116,21 +125,21 @@ public class Utilidades {
         return (!IsPrimitive(clase) && !isBoolean(clase) && !isCharacter(clase) && !isNumber(clase) && !isString(clase));
     }
 
-    public static Double calcularDistancia(Double y, Double y1, Double x, Double x1){
+    public static Double calcularDistancia(Double y, Double y1, Double x, Double x1) {
         Double yy = y - y1;
         Double xx = x - x1;
-        return redondear(Math.sqrt((yy*yy)+(xx*xx)));
+        return redondear(Math.sqrt((yy * yy) + (xx * xx)));
     }
-    
-    public static Double redondear(Double dato){
-        return Math.round(dato * 100.0)/100.0;
+
+    public static Double redondear(Double dato) {
+        return Math.round(dato * 100.0) / 100.0;
     }
-    
+
     public static boolean guardarJson(ArbolController arbolController) {
 //        Gson gson = new Gson();
         String json = gson.toJson(arbolController);
 
-        try ( BufferedWriter bw = new BufferedWriter(new FileWriter(DISCARPDATA + File.separatorChar + "data.json"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(DISCARPDATA + File.separatorChar + "data.json"))) {
             bw.write(json);
             System.out.println("ArbolController Guardado");
             return true;
@@ -147,9 +156,9 @@ public class Utilidades {
         try {
             BufferedReader br = new BufferedReader(new FileReader(DISCARPDATA + File.separatorChar + "data.json"));
             String linea = "";
-                while ((linea = br.readLine()) != null) {
-                    fichero = fichero + linea;
-                }
+            while ((linea = br.readLine()) != null) {
+                fichero = fichero + linea;
+            }
             br.close();
         } catch (FileNotFoundException e) {
             System.out.println("Error: " + e);
@@ -159,12 +168,12 @@ public class Utilidades {
         ArbolController arboles = gson.fromJson(fichero, ArbolController.class);
         return arboles;
     }
-    
+
     public static boolean guardarJsonPosiciones(PosicionController posicionController) {
 //        Gson gson = new Gson();
         String json = gson.toJson(posicionController);
 
-        try ( BufferedWriter bw = new BufferedWriter(new FileWriter(DISCARPDATA + File.separatorChar + "posiciones.json"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(DISCARPDATA + File.separatorChar + "posiciones.json"))) {
             bw.write(json);
             System.out.println("Posiciones guardadas");
             return true;
@@ -173,7 +182,7 @@ public class Utilidades {
             return false;
         }
     }
-    
+
     public static PosicionController cargarJsonposicionController() {
         String fichero = "";
 //        Gson gson = new Gson();
@@ -181,9 +190,9 @@ public class Utilidades {
         try {
             BufferedReader br = new BufferedReader(new FileReader(DISCARPDATA + File.separatorChar + "posiciones.json"));
             String linea = "";
-                while ((linea = br.readLine()) != null) {
-                    fichero = fichero + linea;
-                }
+            while ((linea = br.readLine()) != null) {
+                fichero = fichero + linea;
+            }
             br.close();
         } catch (FileNotFoundException e) {
             System.out.println("Error: " + e);
@@ -193,12 +202,12 @@ public class Utilidades {
         PosicionController posiciones = gson.fromJson(fichero, PosicionController.class);
         return posiciones;
     }
-    
+
     public static boolean guardarGrafoJson(GrafoNoDirigidoEtiquetado grafoNoDirigidoEtiquetado) {
 //        Gson gson = new Gson();
         String json = gson.toJson(grafoNoDirigidoEtiquetado);
 
-        try ( BufferedWriter bw = new BufferedWriter(new FileWriter(DISCARPDATA + File.separatorChar + "grafo.json"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(DISCARPDATA + File.separatorChar + "grafo.json"))) {
             bw.write(json);
             System.out.println("Grafo Guardado");
             return true;
@@ -216,9 +225,9 @@ public class Utilidades {
         try {
             BufferedReader br = new BufferedReader(new FileReader(DISCARPDATA + File.separatorChar + "grafo.json"));
             String linea = "";
-                while ((linea = br.readLine()) != null) {
-                    fichero = fichero + linea;
-                }
+            while ((linea = br.readLine()) != null) {
+                fichero = fichero + linea;
+            }
             br.close();
         } catch (FileNotFoundException e) {
             System.out.println("Error: " + e);
