@@ -5,20 +5,28 @@
  */
 package vista.Jarras;
 
+import controlador.Listas.ListaEnlazada;
 import controlador.jarra.ArbolJarras;
 import controlador.jarra.NodoJarra;
 import controlador.utiles.Utilidades;
+import java.awt.Color;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
  * @author Usuario iTC
  */
-public class FrmJarras extends javax.swing.JFrame {
-
+public class FrmJarras extends javax.swing.JFrame implements Runnable {
+    
     private ArbolJarras arbolJarras;
     private NodoJarra ei = new NodoJarra();
     private NodoJarra ef = new NodoJarra();
     private NodoJarra respuesta;
+    private DefaultTableModel modeloTablaGrande;
+    private DefaultTableModel modeloTablaPeque;
 
     /**
      * Creates new form FrmJarras
@@ -27,9 +35,37 @@ public class FrmJarras extends javax.swing.JFrame {
         initComponents();
         ei.crearJarras(4, 3);
         cargarCombos();
+        crearTabla();
         setLocationRelativeTo(this);
     }
-
+    
+    private void crearTabla() {
+        modeloTablaGrande = new DefaultTableModel(ei.getjGrande().getCapacidad(), 1);
+        tblJGrande.setModel(modeloTablaGrande);
+//        tblJGrande.getColumn("A").setHeaderValue("Estados");
+        Utilidades.cambiarTituloTabla(tblJGrande, "Estados");
+//        Utilidades.cambiarColorFila(tblJGrande, cbxEFJGrande.getSelectedIndex());
+        tblJGrande.updateUI();
+        modeloTablaPeque = new DefaultTableModel(ei.getjPequenia().getCapacidad(), 1);
+        tblJPequenia.setModel(modeloTablaPeque);
+//        tblJPequenia.getColumn("A").setHeaderValue("Estados");
+        Utilidades.cambiarTituloTabla(tblJPequenia, "Estados");
+//        Utilidades.cambiarColorFila(tblJPequenia, cbxEFJPequenia.getSelectedIndex());
+        tblJGrande.updateUI();
+    }
+    
+    private void cambiarDatos(Integer estadoJG, Integer estadoJP) {
+        crearTabla();
+        Utilidades.cambiarColorFila(tblJGrande, estadoJG);
+        Utilidades.cambiarColorFila(tblJPequenia, estadoJP);
+    }
+    
+    private void cbxEstadoIncial() {
+        Integer eijg = cbxEiJGrande.getSelectedIndex();
+        Integer eijp = cbxEiJPequenia.getSelectedIndex();
+        cambiarDatos(eijg, eijp);
+    }
+    
     private void cargarCombos() {
         try {
             Utilidades.cargarComboEstado(cbxEiJGrande, ei.getjGrande());
@@ -39,7 +75,7 @@ public class FrmJarras extends javax.swing.JFrame {
         } catch (Exception e) {
         }
     }
-
+    
     private void ejecutar() {
         Integer eijg = cbxEiJGrande.getSelectedIndex();
         Integer efjg = cbxEFJGrande.getSelectedIndex();
@@ -51,13 +87,40 @@ public class FrmJarras extends javax.swing.JFrame {
         try {
             respuesta = arbolJarras.busqueda_anchura();
             if (respuesta != null) {
-                System.out.println("EL camino es");
-                arbolJarras.camino(respuesta).imprimir();
+//                System.out.println("EL camino es");
+                txtCamino.setText("SI HAY CAMINO");
+//                arbolJarras.camino(respuesta).imprimir();
+                Thread hilo = new Thread(this);
+                hilo.start();
             } else {
+                txtCamino.setText("NO HAY CAMINO");
                 System.out.println("No hay camino");
             }
         } catch (Exception e) {
             System.out.println(e);
+        }
+    }
+    
+    @Override
+    public void run() {
+        if (respuesta != null) {
+            try {
+                ListaEnlazada<NodoJarra> lista = arbolJarras.camino(respuesta);
+                StringBuilder texto = new StringBuilder(txtCamino.getText() + "\n");
+                for (int i = 0; i < lista.getSize(); i++) {
+                    NodoJarra aux = lista.obtener(i);
+                    Integer jG = aux.getjGrande().getCapacidadActual();
+                    Integer jP = aux.getjPequenia().getCapacidadActual();
+                    cambiarDatos(jG, jP);
+                    texto.append("(" + jG + "-" + jP + ")" + "\n");
+                    txtCamino.setText(texto.toString());
+                    Thread.sleep(2000);
+                }
+                txtCamino.setText(texto.toString());
+                btnBuscarCamino.setEnabled(true);
+            } catch (Exception e) {
+                btnBuscarCamino.setEnabled(true);
+            }
         }
     }
 
@@ -72,7 +135,7 @@ public class FrmJarras extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        btnBuscarCamino = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         cbxEiJGrande = new javax.swing.JComboBox<>();
@@ -83,20 +146,30 @@ public class FrmJarras extends javax.swing.JFrame {
         cbxEiJPequenia = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         cbxEFJPequenia = new javax.swing.JComboBox<>();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblJPequenia = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblJGrande = new javax.swing.JTable();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        txtCamino = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Estados"));
         jPanel2.setLayout(null);
 
-        jButton1.setText("Buscar Camino");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnBuscarCamino.setText("Buscar Camino");
+        btnBuscarCamino.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnBuscarCaminoActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1);
-        jButton1.setBounds(434, 220, 150, 29);
+        jPanel2.add(btnBuscarCamino);
+        btnBuscarCamino.setBounds(440, 200, 150, 29);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Jarra Grande"));
         jPanel3.setLayout(null);
@@ -128,7 +201,7 @@ public class FrmJarras extends javax.swing.JFrame {
         cbxEFJGrande.setBounds(130, 90, 120, 29);
 
         jPanel2.add(jPanel3);
-        jPanel3.setBounds(10, 30, 270, 170);
+        jPanel3.setBounds(10, 20, 270, 170);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Jarra Pequeña"));
         jPanel4.setLayout(null);
@@ -160,7 +233,60 @@ public class FrmJarras extends javax.swing.JFrame {
         cbxEFJPequenia.setBounds(140, 90, 120, 29);
 
         jPanel2.add(jPanel4);
-        jPanel4.setBounds(300, 30, 290, 170);
+        jPanel4.setBounds(300, 20, 290, 170);
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Simulación"));
+        jPanel5.setLayout(null);
+
+        tblJPequenia.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(tblJPequenia);
+
+        jPanel5.add(jScrollPane1);
+        jScrollPane1.setBounds(320, 40, 290, 200);
+
+        tblJGrande.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tblJGrande);
+
+        jPanel5.add(jScrollPane2);
+        jScrollPane2.setBounds(10, 42, 290, 200);
+
+        jLabel5.setText("Tabla Pequeña");
+        jPanel5.add(jLabel5);
+        jLabel5.setBounds(430, 20, 100, 21);
+
+        jLabel6.setText("Tabla Grande");
+        jPanel5.add(jLabel6);
+        jLabel6.setBounds(110, 20, 100, 21);
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Camino"));
+        jPanel6.setLayout(null);
+
+        txtCamino.setColumns(20);
+        txtCamino.setRows(5);
+        jScrollPane3.setViewportView(txtCamino);
+
+        jPanel6.add(jScrollPane3);
+        jScrollPane3.setBounds(10, 30, 100, 460);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -168,24 +294,32 @@ public class FrmJarras extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(79, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,6 +331,7 @@ public class FrmJarras extends javax.swing.JFrame {
 
     private void cbxEiJGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxEiJGrandeActionPerformed
         // TODO add your handling code here:
+        cbxEstadoIncial();
     }//GEN-LAST:event_cbxEiJGrandeActionPerformed
 
     private void cbxEFJGrandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxEFJGrandeActionPerformed
@@ -205,16 +340,18 @@ public class FrmJarras extends javax.swing.JFrame {
 
     private void cbxEiJPequeniaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxEiJPequeniaActionPerformed
         // TODO add your handling code here:
+        cbxEstadoIncial();
     }//GEN-LAST:event_cbxEiJPequeniaActionPerformed
 
     private void cbxEFJPequeniaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxEFJPequeniaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cbxEFJPequeniaActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnBuscarCaminoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarCaminoActionPerformed
         // TODO add your handling code here:
         ejecutar();
-    }//GEN-LAST:event_jButton1ActionPerformed
+        crearTabla();
+    }//GEN-LAST:event_btnBuscarCaminoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -252,18 +389,28 @@ public class FrmJarras extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBuscarCamino;
     private javax.swing.JComboBox<String> cbxEFJGrande;
     private javax.swing.JComboBox<String> cbxEFJPequenia;
     private javax.swing.JComboBox<String> cbxEiJGrande;
     private javax.swing.JComboBox<String> cbxEiJPequenia;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable tblJGrande;
+    private javax.swing.JTable tblJPequenia;
+    private javax.swing.JTextArea txtCamino;
     // End of variables declaration//GEN-END:variables
 }

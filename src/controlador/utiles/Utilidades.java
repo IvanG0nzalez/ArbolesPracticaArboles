@@ -20,6 +20,14 @@ import modelo.Arbol;
 import controlador.ArbolController;
 import controlador.PosicionController;
 import controlador.grafo.GrafoNoDirigidoEtiquetado;
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import modelo.Posicion;
 import modelo.enums.Orientacion;
 import modelo.jarra.Jarra;
@@ -32,6 +40,7 @@ public class Utilidades {
 
     public static String DISCARPDATA = "data";
     public static Gson gson = new Gson();
+    private static Integer inicial;
 
     public static JComboBox cargarComboOrientacion(JComboBox cbx) {
         cbx.removeAllItems();
@@ -64,7 +73,38 @@ public class Utilidades {
         }
         return cbx;
     }
+    
+    public static void cambiarTituloTabla(JTable tabla, String valor) {
+        JTableHeader tableHeader = tabla.getTableHeader();
+        TableColumnModel tableColumnModel =  tableHeader.getColumnModel();
+        TableColumn tableColumn = tableColumnModel.getColumn(0);
+        tableColumn.setHeaderValue(valor);
+        tableHeader.repaint();
+    }
 
+    public static void cambiarColorFila(JTable tabla, Integer estado) {
+        Integer cont = 1;
+        inicial = tabla.getRowCount() - 1;
+        for (int i = 0; i < estado; i++) {
+            tabla.setValueAt(cont, inicial, 0);
+            
+            tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, inicial, 0);
+                    c.setBackground(Color.darkGray);
+                    c.setForeground(Color.white);
+                    return c;
+                }
+            });
+            
+            inicial--;
+            cont++;
+        }
+    }
+    
+    
+    
     public static String capitalizar(String nombre) {
         char[] aux = nombre.toCharArray();
         aux[0] = Character.toUpperCase(aux[0]);
